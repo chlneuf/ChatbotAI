@@ -6,9 +6,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
-import java.time.LocalDateTime
 
 @Entity
 class AIProvider (
@@ -18,7 +16,8 @@ class AIProvider (
     var id: Long? = null,
     var name: String,
 
-    @OneToMany(mappedBy = "provider",cascade = [CascadeType.REMOVE], orphanRemoval = true)
-    var models: MutableList<AIModel> = mutableListOf()
+    @OneToMany(mappedBy = "provider", cascade = [CascadeType.REMOVE], orphanRemoval = true)
+    var models: MutableList<AIModel> = mutableListOf(),
+
 
 )

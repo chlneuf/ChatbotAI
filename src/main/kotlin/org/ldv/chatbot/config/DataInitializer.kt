@@ -1,11 +1,17 @@
 package org.ldv.chatbot.config
 
+import org.ldv.chatbot.model.dao.AIModelDAO
+import org.ldv.chatbot.model.dao.AIProviderDAO
+import org.ldv.chatbot.model.entity.AIModel
+import org.ldv.chatbot.model.entity.AIProvider
+import org.springframework.boot.CommandLineRunner
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-/**
+
 @Configuration
 class DataInitializer(
-    private val fourniseurIADAO: F,
-    private val modeleIADAO: ModeleIADAO
+    private val fourniseurIADAO: AIProviderDAO,
+    private val modeleIADAO: AIModelDAO
 ) {
 
     @Bean
@@ -13,62 +19,52 @@ class DataInitializer(
 
         // Vérifier si le fournisseur Mistral existe déjà
         val mistral = fourniseurIADAO.findAll()
-            .firstOrNull { it.nom == "Mistral" }
+            .firstOrNull { it.name == "Mistral" }
             ?: fourniseurIADAO.save(
-                FourniseurIA(
-                    nom = "Mistral",
-                    cheminLogo = "/images/mistral.png",
-                    description = "Fournisseur français de modèles d'intelligence artificielle."
+                AIProvider(name = "Mistral"),
+
                 )
-            )
+
         val gemini = fourniseurIADAO.findAll()
-            .firstOrNull { it.nom == "Gemini" }
+            .firstOrNull { it.name == "Gemini" }
             ?: fourniseurIADAO.save(
-                FourniseurIA(
-                    nom = "Gemini",
-                    cheminLogo = "/images/gemini.png",
-                    description = "Modèles d'intelligence artificielle de Google."
+                AIProvider(name = "Gemini"),
+
                 )
-            )
+
 
         // Modèles à initialiser
         val modeles = listOf(
-            ModeleIA(
-                nom = "gemini-3.8-flash",
-                urlAPI = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-                description = "Modèle rapide et polyvalent.",
-                cheminLogo = "/images/gemini.png",
-                fourniseurIA = gemini
+            AIModel(
+                name = "gemini-3.8-flash",
+                urlApi = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+                descriptor = "Modèle rapide et polyvalent.",
+                provider = gemini
+            ),
+            AIModel(
+                name = "gemini-3.5-flash-lite",
+                urlApi = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+                descriptor = "Modèle rapide pour les tâches simples.",
+                provider = gemini
+            ),
+            AIModel(
+                name = "mistral-small-latest",
+                urlApi = "https://api.mistral.ai/v1/chat/completions",
+                descriptor = "Modèle léger pour les conversations et les tâches courantes.",
+                provider = mistral
+            ),
+            AIModel(
+                name = "mistral-medium-latest",
+                urlApi = "https://api.mistral.ai/v1/chat/completions",
+                descriptor = "Modèle plus avancé pour les tâches complexes.",
+                provider = mistral
             ),
 
-            ModeleIA(
-                nom = "gemini-3.5-flash-lite",
-                urlAPI = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
-                description = "Modèle rapide pour les tâches simples.",
-                cheminLogo = "/images/gemini.png",
-                fourniseurIA = gemini
-            ),
-            ModeleIA(
-                nom = "mistral-small-latest",
-                urlAPI = "https://api.mistral.ai/v1/chat/completions",
-                description = "Modèle léger pour les conversations et les tâches courantes.",
-                cheminLogo = "/images/mistral.png",
-                fourniseurIA = mistral
-            ),
-
-            ModeleIA(
-                nom = "mistral-medium-latest",
-                urlAPI = "https://api.mistral.ai/v1/chat/completions",
-                description = "Modèle plus avancé pour les tâches complexes.",
-                cheminLogo = "/images/mistral.png",
-                fourniseurIA = mistral
             )
-        )
-
         // Éviter de recréer les modèles à chaque démarrage
         for (modele in modeles) {
             val existe = modeleIADAO.findAll()
-                .any { it.nom == modele.nom }
+                .any { it.name == modele.name }
 
             if (!existe) {
                 modeleIADAO.save(modele)
@@ -76,4 +72,3 @@ class DataInitializer(
         }
     }
 }
-**/
