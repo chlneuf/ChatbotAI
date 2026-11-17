@@ -1,4 +1,7 @@
 package org.ldv.chatbot.model.entity
 
-class TypeMessage {
+enum class TypeMessage {
+    SYSTEME,
+    UTILISATEUR,
+    ASSISTANT
 }

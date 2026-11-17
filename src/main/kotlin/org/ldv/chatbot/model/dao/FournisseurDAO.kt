@@ -1,4 +1,4 @@
 package org.ldv.chatbot.model.dao
 
-interface MessageDAO {
+interface FournisseurDAO {
 }
