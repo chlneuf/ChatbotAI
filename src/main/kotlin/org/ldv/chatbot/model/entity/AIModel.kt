@@ -26,4 +26,6 @@ class AIModel (
 
     @OneToMany(mappedBy = "model",cascade = [CascadeType.REMOVE], orphanRemoval = true)
 var conversations: MutableList<Conversation> = mutableListOf()
-    )
+    ) {
+
+}

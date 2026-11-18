@@ -18,14 +18,18 @@ class Conversation (
     @Column(nullable = false)
     var id: Long? = null,
     var title: String,
-    var createdAt : LocalDateTime,
-
+    var createdAt: LocalDateTime= LocalDateTime.now(),
+    var dateDerniereModification: LocalDateTime = LocalDateTime.now(),
     @ManyToOne
-@JoinColumn(name = "aimodel_id")
-var model: AIModel,
+    @JoinColumn(name = "aimodel_id")
+    var model: AIModel,
 
 
-    @OneToMany(mappedBy = "conversation",cascade = [CascadeType.REMOVE], orphanRemoval = true)
-var messages: MutableList<Message> = mutableListOf()
-)
+    @OneToMany(mappedBy = "conversation", cascade = [CascadeType.REMOVE], orphanRemoval = true)
+    var messages: MutableList<Message> = mutableListOf(),
+
+
+    ) {
+
+}
 

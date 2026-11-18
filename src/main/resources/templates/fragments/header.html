@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<!-- Nouvelle conversation -->
+<a th:href="@{/}" class="btn btn-outline-light w-100 mb-4">
+  + Nouvelle conversation
+</a>
+
+<h6 class="text-secondary">Historique</h6>
+<div class="list-group">
+  <a th:each="c : ${conversations}"
+     th:href="@{/conversations/{id}(id=${c.id})}"
+     th:text="${c.titre}"
+     class="list-group-item list-group-item-action"
+     th:classappend="${conversation != null and conversation.id == c.id} ? 'active' : ''">
+  </a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<div th:each="message : ${messages}"
+     class="mb-4">
+
+  <strong th:text="${message.typeMessage}"></strong>
+
+  <div class="message mt-2 message-content markdown-content"
+       th:text="${message.contenu}">
+  </div>
+
+</div>
+<script>
+  document.querySelectorAll('.markdown-content').forEach(element => {
+    const markdown = element.textContent;
+    const html = marked.parse(markdown);
+    element.innerHTML = DOMPurify.sanitize(html);
+  });
+</script>
