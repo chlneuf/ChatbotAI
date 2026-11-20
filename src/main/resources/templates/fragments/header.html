@@ -1,33 +1,191 @@
-<!-- Nouvelle conversation -->
-<a th:href="@{/}" class="btn btn-outline-light w-100 mb-4">
-  + Nouvelle conversation
-</a>
 
-<h6 class="text-secondary">Historique</h6>
-<div class="list-group">
-  <a th:each="c : ${conversations}"
-     th:href="@{/conversations/{id}(id=${c.id})}"
-     th:text="${c.titre}"
-     class="list-group-item list-group-item-action"
-     th:classappend="${conversation != null and conversation.id == c.id} ? 'active' : ''">
-  </a>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
-<div th:each="message : ${messages}"
-     class="mb-4">
+<div xmlns:th="http://www.thymeleaf.org"
+     th:fragment="header"
+     class="church-sidebar">
 
-  <strong th:text="${message.typeMessage}"></strong>
+  <!-- LOGO -->
+  <div class="sidebar-brand">
+    <div class="church-logo">
+      <img th:src="@{/images/logoIA.png}"
+           alt="Logo Church"
+           onerror="this.style.display='none'">
+      <span>✦</span>
+    </div>
 
-  <div class="message mt-2 message-content markdown-content"
-       th:text="${message.contenu}">
+    <div class="brand-text">
+      <h2>Church</h2>
+      <p>Votre chatbot multi-IA</p>
+    </div>
+  </div>
+
+  <!-- NOUVELLE CONVERSATION -->
+  <div class="sidebar-new-chat">
+    <a th:href="@{/}" class="new-chat-button">
+      <span class="new-chat-icon">＋</span>
+      Nouvelle conversation
+    </a>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div class="sidebar-history">
+
+    <div class="history-heading">
+      <span>HISTORIQUE</span>
+      <span class="history-icon">◷</span>
+    </div>
+
+    <div class="history-list">
+
+      <div th:each="c : ${conversations}"
+           class="history-item-container">
+
+        <a th:href="@{/conversations/{id}(id=${c.id})}"
+           th:classappend="${conversation != null and conversation.id == c.id} ? 'active' : ''"
+           class="history-item">
+
+          <span class="history-item-icon">▤</span>
+
+          <span class="history-item-title"
+                th:text="${c.title}">
+                        Nouvelle conversation
+                    </span>
+        </a>
+
+        <!-- MENU TROIS POINTS -->
+        <div class="conversation-menu">
+
+          <button type="button"
+                  class="conversation-menu-trigger"
+                  aria-label="Options de la conversation"
+                  aria-expanded="false">
+            ⋮
+          </button>
+
+          <div class="conversation-menu-dropdown">
+
+            <!-- ÉPINGLER / DÉSÉPINGLER -->
+            <form th:action="@{/conversations/{id}/pin(id=${c.id})}"
+                  method="post">
+
+              <button type="submit"
+                      class="conversation-menu-item">
+
+                <i th:class="${c.pinned} ? 'bi bi-pin-fill' : 'bi bi-pin'"></i>
+
+                <span th:text="${c.pinned} ? 'Désépingler' : 'Épingler'">
+                                    Épingler
+                                </span>
+
+                <span class="menu-shortcut">P</span>
+              </button>
+            </form>
+
+            <!-- RENOMMER -->
+            <form th:action="@{/conversations/{id}/rename(id=${c.id})}"
+                  method="post"
+                  class="rename-conversation-form">
+
+              <input type="text"
+                     name="title"
+                     class="rename-conversation-input"
+                     placeholder="Nouveau nom"
+                     maxlength="100"
+                     required>
+
+              <button type="submit"
+                      class="conversation-menu-item">
+                <i class="bi bi-pencil"></i>
+                Renommer
+                <span class="menu-shortcut">R</span>
+              </button>
+            </form>
+
+            <!-- PARTAGER -->
+            <button type="button"
+                    class="conversation-menu-item share-conversation-button"
+                    th:attr="data-url=@{/conversations/{id}(id=${c.id})}">
+
+              <i class="bi bi-share"></i>
+              Partager
+
+            </button>
+
+            <!-- VERROUILLER -->
+            <button type="button"
+                    class="conversation-menu-item"
+                    data-action="lock">
+              <i class="bi bi-lock"></i>
+              Lock
+            </button>
+
+            <!-- PROJET -->
+            <button type="button"
+                    class="conversation-menu-item"
+                    data-action="project">
+              <i class="bi bi-folder"></i>
+              Déplacer vers un projet
+              <i class="bi bi-chevron-right menu-chevron"></i>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <!-- ARCHIVER -->
+            <button type="button"
+                    class="conversation-menu-item"
+                    data-action="archive">
+              <i class="bi bi-archive"></i>
+              Archiver
+              <span class="menu-shortcut">A</span>
+            </button>
+
+            <!-- SUPPRIMER -->
+            <form th:action="@{/conversations/{id}/delete(id=${c.id})}"
+                  method="post"
+                  onsubmit="return confirm('Supprimer définitivement cette conversation ?');">
+
+              <button type="submit"
+                      class="conversation-menu-item delete-menu-item">
+                <i class="bi bi-trash"></i>
+                Supprimer
+              </button>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div th:if="${conversations == null or #lists.isEmpty(conversations)}"
+           class="history-empty">
+        Aucune conversation pour le moment.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BAS DE LA SIDEBAR -->
+  <div class="sidebar-bottom">
+
+    <a th:href="@{/profil}" class="sidebar-bottom-link">
+      <i class="bi bi-person-circle"></i>
+      <span>Mon profil</span>
+    </a>
+
+    <a href="#" class="sidebar-menu-item">
+      <span>⚙</span>
+      Paramètres
+    </a>
+
+    <div class="sidebar-separator"></div>
+
+    <form th:action="@{/logout}" method="post">
+      <button type="submit"
+              class="sidebar-menu-item logout-button">
+        <span>⇥</span>
+        Se déconnecter
+      </button>
+    </form>
+
   </div>
 
 </div>
-<script>
-  document.querySelectorAll('.markdown-content').forEach(element => {
-    const markdown = element.textContent;
-    const html = marked.parse(markdown);
-    element.innerHTML = DOMPurify.sanitize(html);
-  });
-</script>

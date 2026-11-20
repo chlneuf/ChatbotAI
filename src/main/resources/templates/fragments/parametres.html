@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: base('Church - Paramètres', ~{::main})}">
+
+<head>
+    <title>Church - Paramètres</title>
+</head>
+
+<body>
+
+<main class="church-chat settings-page">
+
+    <header class="chat-topbar">
+        <div class="topbar-title">
+            <div class="topbar-icon">⚙</div>
+            <div>
+                <h1>Paramètres</h1>
+                <p>Personnalise ton expérience Church</p>
+            </div>
+        </div>
+    </header>
+
+    <section class="settings-content">
+
+        <div class="settings-card">
+            <h2>Apparence</h2>
+            <p>Personnalise l'apparence de Church.</p>
+
+            <label for="themeSelect">Thème de l'application</label>
+            <select id="themeSelect" class="settings-select">
+                <option value="light">Mode clair</option>
+                <option value="dark">Mode sombre</option>
+            </select>
+        </div>
+
+        <div class="settings-card">
+            <h2>Personnalisation</h2>
+            <p>Choisis la couleur principale de ton application.</p>
+
+            <label for="primaryColor">Couleur principale</label>
+            <input type="color"
+                   id="primaryColor"
+                   value="#713BFF">
+        </div>
+
+        <div class="settings-card">
+            <h2>Préférences</h2>
+
+            <label class="settings-option">
+                <span>
+                    Afficher les heures des messages
+                </span>
+                <input type="checkbox" id="showTimes" checked>
+            </label>
+
+            <label class="settings-option">
+                <span>
+                    Activer les notifications
+                </span>
+                <input type="checkbox" id="notifications">
+            </label>
+        </div>
+
+        <div class="settings-card">
+            <h2>À propos de Church</h2>
+            <p>Church est ton assistant conversationnel multi-IA.</p>
+            <p><strong>Version :</strong> 1.0.0</p>
+        </div>
+
+        <button type="button"
+                id="saveSettings"
+                class="settings-save-button">
+            Enregistrer les préférences
+        </button>
+
+        <p id="settingsMessage" class="settings-message"></p>
+
+    </section>
+
+</main>
+
+</body>
+</html>

@@ -1,10 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="fr"
+      th:fragment="base(titre, content)">
+
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title th:text="${titre} ?: 'Church'">Church</title>
+
+  <!-- Favicon -->
+  <link rel="icon"
+        type="image/x-icon"
+        th:href="@{/images/favicon.ico}">
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet"
+        th:href="@{/vendor/bootstrap/css/bootstrap.min.css}">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet"
+        th:href="@{/vendor/bootstrap-icons/bootstrap-icons.min.css}">
+
+  <!-- CSS application -->
+  <link rel="stylesheet"
+        th:href="@{/css/style.css}">
+  <link rel="icon" type="image/x-icon" th:href="@{/images/Icone.png}">
 </head>
+
 <body>
-$END$
+
+<!-- Layout principal -->
+<div class="church-layout">
+
+  <!-- Sidebar -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <!-- Contenu de la page -->
+  <div class="church-main">
+
+    <div th:replace="${content}"></div>
+
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+<!-- Markdown -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+
+<script>
+  document.querySelectorAll('.markdown-content').forEach(element => {
+    const markdown = element.textContent;
+    const html = marked.parse(markdown);
+    element.innerHTML = DOMPurify.sanitize(html);
+  });
+</script>
+
+<script th:src="@{/js/chat.js}"></script>
 </body>
 </html>

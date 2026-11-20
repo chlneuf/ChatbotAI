@@ -1,134 +1,231 @@
+
 <!DOCTYPE html>
 <html lang="fr"
       xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{base :: layout(~{::title}, ~{::main})}">
+      th:replace="~{base :: base('Church - Assistant IA', ~{::main})}">
 
 <head>
-    <title>Assistant IA</title>
+    <title>Church - Assistant IA</title>
 </head>
 
 <body>
 
-<main class="chat-page flex-grow-1 d-flex flex-column">
+<main class="church-chat">
 
-    <!-- Zone des messages -->
-    <section class="flex-grow-1 overflow-auto p-4">
+    <!-- En-tête -->
+    <header class="chat-topbar">
+        <div class="topbar-title">
+            <div class="topbar-icon">✦</div>
+            <div>
+                <h1>Assistant IA</h1>
+                <p>Discutez avec le modèle d'IA de votre choix</p>
+            </div>
+        </div>
 
-        <!-- Aucune conversation sélectionnée -->
-        <div th:if="${conversation == null}"
-             class="text-center mt-5">
+        <div class="topbar-actions">
+            <label for="modelDisplay">Modèle IA :</label>
 
-            <h2>Comment puis-je vous aider ?</h2>
+            <div class="current-model" id="modelDisplay">
+                <span th:if="${conversation != null}"
+                      th:text="${conversation.model.name}">
+                    Modèle IA
+                </span>
 
-            <p class="text-muted">
-                Choisissez un modèle IA et posez votre question.
+                <span th:if="${conversation == null}">
+                    Choisir un modèle
+                </span>
+            </div>
+
+            <div class="user-avatar">U</div>
+        </div>
+    </header>
+
+    <!-- Zone principale -->
+    <section class="chat-content">
+
+        <div class="chat-scroll-area">
+
+            <!-- Accueil sans conversation -->
+            <div th:if="${conversation == null}"
+                 class="welcome-card">
+
+                <div class="welcome-decoration decoration-one"></div>
+                <div class="welcome-decoration decoration-two"></div>
+
+                <div class="welcome-robot">🤖</div>
+
+                <h2>
+                    Bienvenue sur <span>Church</span> !
+                </h2>
+
+                <p>
+                    Pose une question et échange avec ton modèle
+                    d'IA préféré.
+                </p>
+            </div>
+
+            <!-- Historique des messages -->
+            <div th:if="${conversation != null}"
+                 class="messages-container">
+
+                <div class="conversation-heading">
+                    <h2 th:text="${conversation.title}">
+                        Nouvelle conversation
+                    </h2>
+                    <p>Votre conversation avec Church</p>
+                </div>
+
+                <div th:each="message : ${messages}"
+                     class="message-row"
+                     th:classappend="${message.typeMessage}">
+
+                    <!-- Avatar assistant -->
+                    <div class="message-avatar"
+                         th:if="${message.typeMessage.toString() == 'ASSISTANT'}">
+                        🤖
+                    </div>
+
+                    <!-- Contenu du message -->
+                    <div class="message-bubble">
+
+                        <div class="message-author"
+                             th:text="${message.typeMessage}">
+                            ASSISTANT
+                        </div>
+
+                        <div class="message-content markdown-content"
+                             th:text="${message.contenu}">
+                            Contenu du message
+                        </div>
+
+                        <!-- Bouton copier -->
+                        <button type="button"
+                                class="copy-message-button"
+                                th:if="${message.typeMessage.toString() == 'ASSISTANT'}"
+                                title="Copier la réponse">
+                            <i class="bi bi-copy"></i>
+                            Copier
+                        </button>
+
+                        <div class="message-time"
+                             th:text="${#temporals.format(message.dateCreation, 'HH:mm')}">
+                            10:25
+                        </div>
+
+                    </div>
+
+                    <!-- Avatar utilisateur -->
+                    <div class="message-avatar user-message-avatar"
+                         th:if="${message.typeMessage.toString() == 'UTILISATEUR'}">
+                        U
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Zone de saisie -->
+        <div class="chat-input-area">
+
+            <!-- Nouvelle conversation -->
+            <form id="formChat"
+                  th:if="${conversation == null}"
+                  th:action="@{/conversations}"
+                  method="post"
+                  class="chat-form">
+
+                <div class="input-wrapper">
+
+                    <button type="button"
+                            class="attachment-button"
+                            title="Pièces jointes (bientôt disponibles)"
+                            disabled>
+                        📎
+                    </button>
+
+                    <select name="idModele"
+                            class="chat-model-select"
+                            required>
+
+                        <option value="" disabled selected>
+                            Modèle IA
+                        </option>
+
+                        <option th:each="modele : ${modeles}"
+                                th:value="${modele.id}"
+                                th:text="${modele.name}">
+                        </option>
+
+                    </select>
+
+                    <textarea name="prompt"
+                              class="chat-textarea"
+                              placeholder="Écris un message..."
+                              rows="1"
+                              required></textarea>
+
+                    <button type="submit"
+                            class="send-button"
+                            title="Envoyer">
+                        ➤
+                    </button>
+
+                </div>
+
+                <div class="chat-loading" hidden>
+                    <span class="loading-spinner"></span>
+                    Church prépare sa réponse...
+                </div>
+
+            </form>
+
+            <!-- Conversation existante -->
+            <form th:if="${conversation != null}"
+                  th:action="@{/conversations/{id}/messages(id=${conversation.id})}"
+                  method="post"
+                  class="chat-form">
+
+                <div class="input-wrapper">
+
+                    <button type="button"
+                            class="attachment-button"
+                            title="Pièces jointes (bientôt disponibles)"
+                            disabled>
+                        📎
+                    </button>
+
+                    <textarea name="prompt"
+                              class="chat-textarea"
+                              placeholder="Écris un message..."
+                              rows="1"
+                              required></textarea>
+
+                    <button type="submit"
+                            class="send-button"
+                            title="Envoyer">
+                        ➤
+                    </button>
+
+                </div>
+
+                <div class="chat-loading" hidden>
+                    <span class="loading-spinner"></span>
+                    Church prépare sa réponse...
+                </div>
+
+            </form>
+
+            <p class="input-disclaimer">
+                Church peut parfois produire des réponses incorrectes.
+                Vérifiez les informations importantes.
             </p>
 
         </div>
 
-        <!-- Historique des messages -->
-        <div th:each="message : ${messages}"
-             class="mb-4">
-
-            <strong th:text="${message.typeMessage}">
-            </strong>
-
-            <div class="message mt-2 message-content"
-                 th:text="${message.contenu}">
-            </div>
-
-        </div>
-
     </section>
+
 </main>
+
 </body>
 </html>
-CODE  ·  chat.html — zone de saisie (à placer dans main)
-<!-- Zone de saisie -->
-<div class="border-top p-3">
-
-    <!-- Création d'une conversation -->
-    <form id="formChat"
-          th:if="${conversation == null}"
-          th:action="@{/conversations}"
-          method="post">
-
-        <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-end gap-2">
-
-            <div class="model-select-wrapper">
-                <!-- Choix du modèle IA -->
-                <select name="idModele"
-                        class="form-select model-select"
-                        required>
-
-                    <option value="" disabled selected>
-                        Choisir un modèle IA
-                    </option>
-
-                    <option th:each="modele : ${modeles}"
-                            th:value="${modele.id}"
-                            th:text="${modele.nom}">
-                    </option>
-
-                </select>
-            </div>
-            <div class="flex-grow-1">
-                <!-- Prompt -->
-                <textarea name="prompt"
-                          class="form-control"
-                          rows="2"
-                          placeholder="Posez votre question..."
-                          required></textarea>
-            </div>
-            <div class="send-button-wrapper">
-                <!-- Envoi -->
-                <button class="btn btn-primary"
-                        type="submit">
-                    Envoyer
-                </button>
-            </div>
-        </div>
-
-    </form>
-
-    <!-- Conversation existante -->
-    <form th:if="${conversation != null}"
-          th:action="@{/conversations/{id}/messages(id=${conversation.id})}"
-          method="post">
-
-        <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-end gap-2">
-
-            <!-- Modèle utilisé -->
-            <div class="model-current d-flex align-items-center gap-2">
-
-                <img th:src="@{${conversation.modeleIA.cheminLogo}}"
-                     alt="Logo du modèle"
-                     width="28"
-                     height="28">
-
-                <span th:text="${conversation.modeleIA.nom}">
-                </span>
-
-            </div>
-
-            <!-- Prompt -->
-            <div class="flex-grow-1">
-                <textarea name="prompt"
-                          class="form-control"
-                          rows="2"
-                          placeholder="Écrivez votre message..."
-                          required></textarea>
-            </div>
-            <div class="send-button-wrapper">
-                <!-- Envoi -->
-                <button class="btn btn-primary"
-                        type="submit">
-                    Envoyer
-                </button>
-            </div>
-
-        </div>
-
-    </form>
-
-</div>

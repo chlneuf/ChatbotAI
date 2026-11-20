@@ -16,6 +16,7 @@ class IAServiceFactory(
                 "Aucun fournisseur associé au modèle"
             )
 
+
         return services.firstOrNull {
             it.getFournisseur().equals(
                 fournisseur,

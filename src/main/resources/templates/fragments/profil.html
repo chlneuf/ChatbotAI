@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: base('Church - Mon profil', ~{::main})}">
+<head>
+    <title>Mon profil</title>
+</head>
+<body>
+<main class="church-chat settings-page">
+
+    <header class="chat-topbar">
+        <div class="topbar-title">
+            <div class="topbar-icon">
+                <i class="bi bi-person-circle"></i>
+            </div>
+            <div>
+                <h1>Mon profil</h1>
+                <p>Gère tes informations personnelles</p>
+            </div>
+        </div>
+    </header>
+
+    <section class="settings-content">
+
+        <div class="settings-card">
+            <h2>Informations personnelles</h2>
+
+            <p th:if="${message}" th:text="${message}" class="settings-message"></p>
+
+            <form th:action="@{/profil}" method="post">
+
+                <div class="profile-avatar">
+                    <img th:if="${utilisateur.photoProfil != null}"
+                         th:src="${utilisateur.photoProfil}"
+                         alt="Photo de profil">
+
+                    <i th:unless="${utilisateur.photoProfil != null}"
+                       class="bi bi-person-circle"></i>
+                </div>
+
+                <label for="pseudo">Pseudo</label>
+                <input class="settings-select"
+                       type="text"
+                       id="pseudo"
+                       name="pseudo"
+                       th:value="${utilisateur.pseudo}"
+                       required
+                       maxlength="100">
+
+                <label for="email">Adresse e-mail</label>
+                <input class="settings-select"
+                       type="email"
+                       id="email"
+                       name="email"
+                       th:value="${utilisateur.email}"
+                       required
+                       maxlength="150">
+
+                <label for="photoProfil">URL de la photo de profil</label>
+                <input class="settings-select"
+                       type="url"
+                       id="photoProfil"
+                       name="photoProfil"
+                       th:value="${utilisateur.photoProfil}"
+                       placeholder="https://exemple.com/photo.jpg">
+
+                <button type="submit" class="settings-save-button">
+                    Enregistrer les modifications
+                </button>
+
+            </form>
+        </div>
+
+    </section>
+</main>
+</body>
+</html>
