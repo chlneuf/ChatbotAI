@@ -4,19 +4,21 @@ package org.ldv.chatbot.controller
 import org.ldv.chatbot.model.dao.AIModelDAO
 import org.ldv.chatbot.model.dao.ConversationDAO
 import org.ldv.chatbot.model.dao.MessageDAO
-import org.ldv.chatbot.model.entity.Message
+import org.ldv.chatbot.model.dao.UtilisateurDAO
 import org.ldv.chatbot.model.entity.Conversation
+import org.ldv.chatbot.model.entity.Message
 import org.ldv.chatbot.model.entity.TypeMessage
 import org.ldv.chatbot.service.IAServiceFactory
+import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.server.ResponseStatusException
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Controller
@@ -24,26 +26,48 @@ class ChatController(
     private val iaServiceFactory: IAServiceFactory,
     private val conversationDAO: ConversationDAO,
     private val messageDAO: MessageDAO,
-    private val modeleIADAO: AIModelDAO
+    private val modeleIADAO: AIModelDAO,
+    private val utilisateurDAO: UtilisateurDAO
 ) {
 
-    // Historique : conversations épinglées en premier
-    private fun chargerHistorique(): List<Conversation> {
+    // Récupérer l'utilisateur connecté
+    private fun utilisateurConnecte(authentication: Authentication) =
+        utilisateurDAO.findByEmail(authentication.name)
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+
+    // Récupérer uniquement les conversations de l'utilisateur
+    private fun chargerHistorique(utilisateurId: Long): List<Conversation> {
         return conversationDAO
-            .findAllByOrderByDateDerniereModificationDesc()
+            .findAllByUtilisateur_IdOrderByDateDerniereModificationDesc(utilisateurId)
             .sortedWith(
                 compareByDescending<Conversation> { it.pinned }
                     .thenByDescending { it.dateDerniereModification }
             )
     }
 
+    // Vérifier que la conversation appartient à l'utilisateur
+    private fun chargerConversation(
+        id: Long,
+        utilisateurId: Long
+    ): Conversation {
+        return conversationDAO.findByIdAndUtilisateur_Id(id, utilisateurId)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    }
+
     // Accueil
     @GetMapping("/")
-    fun accueil(model: Model): String {
+    fun accueil(
+        authentication: Authentication,
+        model: Model
+    ): String {
+
+        val utilisateur = utilisateurConnecte(authentication)
+
+        model.addAttribute("utilisateur", utilisateur)
         model.addAttribute("conversation", null)
         model.addAttribute("modeles", modeleIADAO.findAll())
         model.addAttribute("messages", emptyList<Message>())
-        model.addAttribute("conversations", chargerHistorique())
+        model.addAttribute("conversations", chargerHistorique(utilisateur.id!!))
 
         return "chat"
     }
@@ -52,9 +76,11 @@ class ChatController(
     @PostMapping("/conversations")
     fun creerConversation(
         @RequestParam prompt: String,
-        @RequestParam idModele: Long
+        @RequestParam idModele: Long,
+        authentication: Authentication
     ): String {
 
+        val utilisateur = utilisateurConnecte(authentication)
         val promptNettoye = prompt.trim()
 
         if (promptNettoye.isBlank()) {
@@ -75,7 +101,8 @@ class ChatController(
         val conversation = Conversation(
             title = promptNettoye.take(50),
             createdAt = LocalDateTime.now(),
-            model = modele
+            model = modele,
+            utilisateur = utilisateur
         )
 
         val conversationEnregistree = conversationDAO.save(conversation)
@@ -116,15 +143,15 @@ class ChatController(
     @GetMapping("/conversations/{id}")
     fun afficherConversation(
         @PathVariable id: Long,
+        authentication: Authentication,
         model: Model
     ): String {
 
-        val conversation = conversationDAO.findById(id)
-            .orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND)
-            }
+        val utilisateur = utilisateurConnecte(authentication)
+        val conversation = chargerConversation(id, utilisateur.id!!)
 
-        model.addAttribute("conversations", chargerHistorique())
+        model.addAttribute("utilisateur", utilisateur)
+        model.addAttribute("conversations", chargerHistorique(utilisateur.id!!))
         model.addAttribute("modeles", modeleIADAO.findAll())
         model.addAttribute("conversation", conversation)
         model.addAttribute(
@@ -139,9 +166,12 @@ class ChatController(
     @PostMapping("/conversations/{id}/messages")
     fun envoyerMessage(
         @PathVariable id: Long,
-        @RequestParam prompt: String
+        @RequestParam prompt: String,
+        authentication: Authentication
     ): String {
 
+        val utilisateur = utilisateurConnecte(authentication)
+        val conversation = chargerConversation(id, utilisateur.id!!)
         val promptNettoye = prompt.trim()
 
         if (promptNettoye.isBlank()) {
@@ -150,11 +180,6 @@ class ChatController(
                 "Le message ne peut pas être vide"
             )
         }
-
-        val conversation = conversationDAO.findById(id)
-            .orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND)
-            }
 
         val messageUtilisateur = Message(
             contenu = promptNettoye,
@@ -193,13 +218,12 @@ class ChatController(
     @PostMapping("/conversations/{id}/delete")
     @Transactional
     fun supprimerConversation(
-        @PathVariable id: Long
+        @PathVariable id: Long,
+        authentication: Authentication
     ): String {
 
-        val conversation = conversationDAO.findById(id)
-            .orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND)
-            }
+        val utilisateur = utilisateurConnecte(authentication)
+        val conversation = chargerConversation(id, utilisateur.id!!)
 
         conversationDAO.delete(conversation)
 
@@ -210,14 +234,12 @@ class ChatController(
     @PostMapping("/conversations/{id}/rename")
     fun renommerConversation(
         @PathVariable id: Long,
-        @RequestParam title: String
+        @RequestParam title: String,
+        authentication: Authentication
     ): String {
 
-        val conversation = conversationDAO.findById(id)
-            .orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND)
-            }
-
+        val utilisateur = utilisateurConnecte(authentication)
+        val conversation = chargerConversation(id, utilisateur.id!!)
         val nouveauTitre = title.trim()
 
         if (nouveauTitre.isBlank()) {
@@ -238,19 +260,20 @@ class ChatController(
     // Épingler ou désépingler une conversation
     @PostMapping("/conversations/{id}/pin")
     fun epinglerConversation(
-        @PathVariable id: Long
+        @PathVariable id: Long,
+        authentication: Authentication
     ): String {
 
-        val conversation = conversationDAO.findById(id)
-            .orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND)
-            }
+        val utilisateur = utilisateurConnecte(authentication)
+        val conversation = chargerConversation(id, utilisateur.id!!)
 
         conversation.pinned = !conversation.pinned
         conversationDAO.save(conversation)
 
         return "redirect:/"
     }
+
+    // Paramètres
     @GetMapping("/parametres")
     fun afficherParametres(): String {
         return "fragements/parametres"

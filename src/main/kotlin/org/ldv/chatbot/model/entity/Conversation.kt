@@ -14,6 +14,7 @@ import java.time.LocalDateTime
 
 @Entity
 class Conversation(
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -32,6 +33,10 @@ class Conversation(
     @ManyToOne
     @JoinColumn(name = "aimodel_id")
     var model: AIModel,
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "utilisateur_id", nullable = false)
+    var utilisateur: Utilisateur,
 
     @OneToMany(
         mappedBy = "conversation",

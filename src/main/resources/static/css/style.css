@@ -654,6 +654,7 @@ a {
     }
 }
 
+
 /* ==========================================
    CHURCH - SIDEBAR
    ========================================== */
@@ -891,6 +892,7 @@ a {
         width: 250px;
     }
 }
+
 .church-layout {
     display: flex;
     min-height: 100vh;
@@ -913,6 +915,11 @@ a {
         width: 100%;
     }
 }
+
+
+/* ==========================================
+   CHARGEMENT
+   ========================================== */
 
 .chat-loading {
     display: flex;
@@ -947,7 +954,11 @@ a {
     cursor: wait;
 }
 
-/* Mise en forme des réponses Markdown */
+
+/* ==========================================
+   MISE EN FORME DES RÉPONSES MARKDOWN
+   ========================================== */
+
 .markdown-content {
     line-height: 1.7;
     overflow-wrap: anywhere;
@@ -1050,6 +1061,11 @@ a {
     border-radius: 10px;
 }
 
+
+/* ==========================================
+   BOUTON COPIER UN MESSAGE
+   ========================================== */
+
 .copy-message-button {
     display: inline-flex;
     align-items: center;
@@ -1075,6 +1091,11 @@ a {
     color: #16834a;
     border-color: #bce8ce;
 }
+
+
+/* ==========================================
+   HISTORIQUE ET SUPPRESSION
+   ========================================== */
 
 .history-item-container {
     display: flex;
@@ -1123,6 +1144,7 @@ a {
 }
 
 /* Conteneur des conversations */
+
 .history-item-container {
     position: relative;
     display: flex;
@@ -1136,7 +1158,11 @@ a {
     min-width: 0;
 }
 
-/* Bouton trois points */
+
+/* ==========================================
+   MENU TROIS POINTS
+   ========================================== */
+
 .conversation-menu {
     position: relative;
 }
@@ -1164,6 +1190,7 @@ a {
 }
 
 /* Menu déroulant */
+
 .conversation-menu-dropdown {
     display: none;
     position: absolute;
@@ -1240,6 +1267,12 @@ a {
         opacity: 1;
     }
 }
+
+
+/* ==========================================
+   RENOMMER UNE CONVERSATION
+   ========================================== */
+
 .rename-conversation-form {
     margin: 0;
 }
@@ -1264,7 +1297,10 @@ a {
     width: 100%;
 }
 
-/* PAGE PARAMÈTRES */
+
+/* ==========================================
+   PAGE PARAMÈTRES
+   ========================================== */
 
 .settings-content {
     max-width: 850px;
@@ -1294,8 +1330,10 @@ a {
 
 .settings-card label {
     display: block;
-    margin-top: 15px;
+    margin-top: 18px;
+    margin-bottom: 7px;
     font-size: 14px;
+    font-weight: 600;
     color: #34324c;
 }
 
@@ -1349,6 +1387,12 @@ a {
     margin-top: 12px;
     color: #16834a;
 }
+
+
+/* ==========================================
+   PHOTO DE PROFIL
+   ========================================== */
+
 .profile-avatar {
     width: 100px;
     height: 100px;
@@ -1369,9 +1413,62 @@ a {
     object-fit: cover;
 }
 
-.settings-card label {
-    display: block;
-    margin-top: 18px;
-    margin-bottom: 7px;
+
+/* ESPACEMENT DES BOUTONS */
+.church-sidebar .sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 12px !important;
+    width: 100%;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    flex-shrink: 0;
+}
+
+/* FORMULAIRE DE DÉCONNEXION */
+.church-sidebar .sidebar-bottom form {
+    width: 100%;
+    margin: 0;
+}
+
+/* BOUTONS */
+.church-sidebar .church-bottom-link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    min-height: 48px !important;
+    padding: 10px 14px !important;
+    margin: 0 !important;
+    border: none;
+    border-radius: 13px;
+    background: rgba(255,255,255,0.09);
+    color: #FFFFFF !important;
+    font-size: 15px !important;
     font-weight: 600;
+    text-align: left;
+    text-decoration: none !important;
+    cursor: pointer;
+    appearance: none;
+    transition: background 0.2s ease;
+}
+
+/* ICÔNES */
+.church-sidebar .church-bottom-link i {
+    flex: 0 0 21px;
+    width: 21px;
+    font-size: 19px !important;
+    color: #FFFFFF !important;
+    text-align: center;
+}
+
+/* TEXTE */
+.church-sidebar .church-bottom-link span {
+    color: #FFFFFF !important;
+}
+
+/* SURVOL */
+.church-sidebar .church-bottom-link:hover {
+    background: rgba(255,255,255,0.16);
 }

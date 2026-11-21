@@ -1,10 +1,17 @@
+
 package org.ldv.chatbot.model.dao
 
 import org.ldv.chatbot.model.entity.Conversation
-import org.ldv.chatbot.model.entity.Message
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface ConversationDAO : JpaRepository<Conversation, Long> {
-    fun findAllByOrderByDateDerniereModificationDesc(): List<Conversation>
 
+    fun findAllByUtilisateur_IdOrderByDateDerniereModificationDesc(
+        utilisateurId: Long
+    ): List<Conversation>
+
+    fun findByIdAndUtilisateur_Id(
+        id: Long,
+        utilisateurId: Long
+    ): Conversation?
 }

@@ -1,3 +1,4 @@
+
 package org.ldv.chatbot.model.entity
 
 import jakarta.persistence.Column
@@ -18,6 +19,9 @@ class Utilisateur(
 
     @Column(nullable = false, unique = true, length = 150)
     var email: String,
+
+    @Column(nullable = false, length = 100)
+    var motDePasse: String?,
 
     @Column(length = 500)
     var photoProfil: String? = null

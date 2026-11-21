@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Créer un compte - Church</title>
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap-icons/bootstrap-icons.min.css}">
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #101027, #24164b, #713BFF);
+            font-family: Arial, sans-serif;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 440px;
+            padding: 38px;
+            border-radius: 24px;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+        }
+
+        .logo {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 18px;
+            background: #713BFF;
+            color: white;
+            font-size: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 27px;
+            font-weight: 800;
+            color: #171633;
+        }
+
+        .subtitle {
+            margin-bottom: 28px;
+            text-align: center;
+            color: #77758a;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #292744;
+        }
+
+        .form-control {
+            min-height: 48px;
+            border: 1px solid #e4e1ef;
+            border-radius: 12px;
+        }
+
+        .form-control:focus {
+            border-color: #713BFF;
+            box-shadow: 0 0 0 3px rgba(113,59,255,.12);
+        }
+
+        .register-button {
+            width: 100%;
+            min-height: 49px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 12px;
+            background: #713BFF;
+            color: white;
+            font-weight: 700;
+        }
+
+        .register-button:hover {
+            background: #5929d6;
+        }
+
+        .login-link {
+            margin-top: 23px;
+            text-align: center;
+            color: #77758a;
+        }
+
+        .login-link a {
+            color: #713BFF;
+            font-weight: 700;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-card">
+
+    <div class="logo">✦</div>
+
+    <h1>Rejoins Church</h1>
+    <p class="subtitle">Crée ton compte et découvre ton assistant multi-IA.</p>
+
+    <div th:if="${erreur}" class="alert alert-danger"
+         th:text="${erreur}"></div>
+
+    <form th:action="@{/inscription}" method="post">
+
+        <div class="mb-3">
+            <label class="form-label">Pseudo</label>
+            <input type="text" name="pseudo" class="form-control"
+                   placeholder="Ton pseudo" maxlength="100" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Adresse e-mail</label>
+            <input type="email" name="email" class="form-control"
+                   placeholder="exemple@email.com" maxlength="150" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" name="motDePasse" class="form-control"
+                   placeholder="8 caractères minimum" minlength="8" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Confirmer le mot de passe</label>
+            <input type="password" name="confirmationMotDePasse"
+                   class="form-control" placeholder="Répète ton mot de passe"
+                   required>
+        </div>
+
+        <button type="submit" class="register-button">
+            Créer mon compte <i class="bi bi-arrow-right"></i>
+        </button>
+
+    </form>
+
+    <p class="login-link">
+        Tu as déjà un compte ?
+        <a th:href="@{/connexion}">Se connecter</a>
+    </p>
+
+</div>
+
+</body>
+</html>
