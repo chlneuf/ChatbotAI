@@ -35,7 +35,6 @@ class SecurityConfig {
         authenticationProvider: AuthenticationProvider
     ): SecurityFilterChain {
         http
-            .authenticationProvider(authenticationProvider)
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/inscription",
@@ -46,13 +45,17 @@ class SecurityConfig {
                     "/vendor/**"
                 ).permitAll()
 
+                // Réserver l'administration aux administrateurs
+                it.requestMatchers("/admin/**").hasRole("ADMIN")
+
+                // Toutes les autres pages nécessitent une connexion
                 it.anyRequest().authenticated()
             }
             .formLogin {
                 it.loginPage("/connexion")
                     .loginProcessingUrl("/connexion")
                     .usernameParameter("email")
-                    .defaultSuccessUrl("/", true)
+                    .defaultSuccessUrl("/", false)
                     .permitAll()
             }
             .logout {

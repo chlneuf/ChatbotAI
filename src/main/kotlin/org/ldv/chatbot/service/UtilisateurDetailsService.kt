@@ -14,14 +14,14 @@ class UtilisateurDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(email: String): UserDetails {
+
         val utilisateur = utilisateurDAO.findByEmail(email)
             ?: throw UsernameNotFoundException("Utilisateur introuvable")
 
         return User.builder()
             .username(utilisateur.email)
             .password(utilisateur.motDePasse)
-            .roles("USER")
+            .authorities(utilisateur.role.nomLogique)
             .build()
     }
 }
-

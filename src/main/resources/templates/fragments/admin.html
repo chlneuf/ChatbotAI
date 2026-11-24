@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Church - Administration</title>
+
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap-icons/bootstrap-icons.min.css}">
+
+    <style>
+        body {
+            background: #101027;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+
+        .admin-container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .admin-header h1 {
+            color: #A78BFA;
+            font-weight: bold;
+        }
+
+        .admin-card {
+            background: #1B1A38;
+            border: 1px solid #37345F;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .admin-number {
+            font-size: 35px;
+            font-weight: bold;
+            color: #A78BFA;
+        }
+
+        .table {
+            color: white;
+            vertical-align: middle;
+        }
+
+        .table th {
+            color: #A78BFA;
+        }
+
+        .table td, .table th {
+            border-color: #37345F;
+            padding: 15px;
+        }
+
+        .badge-admin {
+            background: #713BFF;
+        }
+
+        .badge-user {
+            background: #45435F;
+        }
+
+        .admin-button {
+            background: #713BFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            text-decoration: none;
+        }
+
+        .admin-button:hover {
+            background: #895FFF;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <div class="admin-header">
+        <div>
+            <h1><i class="bi bi-shield-lock"></i> Church Administration</h1>
+            <p class="text-secondary">Gestion de la plateforme</p>
+        </div>
+
+        <a th:href="@{/}" class="admin-button">
+            <i class="bi bi-arrow-left"></i>
+            Retour au chatbot
+        </a>
+    </div>
+
+    <div class="admin-card">
+        <h5>Nombre d'utilisateurs inscrits</h5>
+        <div class="admin-number" th:text="${nombreUtilisateurs}">0</div>
+    </div>
+
+    <div class="admin-card">
+
+        <h4 class="mb-4">
+            <i class="bi bi-people"></i>
+            Gestion des utilisateurs
+        </h4>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Pseudo</th>
+                    <th>E-mail</th>
+                    <th>Rôle</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="u : ${utilisateurs}">
+                    <td th:text="${u.id}">1</td>
+                    <td th:text="${u.pseudo}">Utilisateur</td>
+                    <td th:text="${u.email}">email@example.com</td>
+                    <td>
+                            <span th:if="${u.role.nomLogique == 'ROLE_ADMIN'}"
+                                  class="badge badge-admin">
+                                Administrateur
+                            </span>
+
+                        <span th:unless="${u.role.nomLogique == 'ROLE_ADMIN'}"
+                              class="badge badge-user">
+                                Utilisateur
+                            </span>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(utilisateurs)}">
+                    <td colspan="4" class="text-center text-secondary">
+                        Aucun utilisateur enregistré.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,15 +1,10 @@
 
 package org.ldv.chatbot.model.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
 @Entity
 class Utilisateur(
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -21,8 +16,12 @@ class Utilisateur(
     var email: String,
 
     @Column(nullable = false, length = 100)
-    var motDePasse: String?,
+    var motDePasse: String,
 
     @Column(length = 500)
-    var photoProfil: String? = null
+    var photoProfil: String? = null,
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "role_id", nullable = false)
+    var role: Role
 )
