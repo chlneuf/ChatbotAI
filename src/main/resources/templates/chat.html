@@ -135,6 +135,11 @@
                   method="post"
                   class="chat-form">
 
+                <!-- Jeton CSRF -->
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
                 <div class="input-wrapper">
 
                     <button type="button"
@@ -185,6 +190,11 @@
                   th:action="@{/conversations/{id}/messages(id=${conversation.id})}"
                   method="post"
                   class="chat-form">
+
+                <!-- Jeton CSRF -->
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
 
                 <div class="input-wrapper">
 

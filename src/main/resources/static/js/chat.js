@@ -145,51 +145,54 @@ document.querySelectorAll(".share-conversation-button").forEach(button => {
 
 });
 // Paramètres Church
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
-    const theme = document.getElementById("themeSelect");
-    const color = document.getElementById("primaryColor");
-    const times = document.getElementById("showTimes");
-    const notifications = document.getElementById("notifications");
-    const save = document.getElementById("saveSettings");
-    const message = document.getElementById("settingsMessage");
+    // Gestion des menus des conversations
+    document.addEventListener("click", event => {
 
-    if (!save) return;
-
-    const saved = JSON.parse(
-        localStorage.getItem("churchSettings") || "{}"
-    );
-
-    theme.value = saved.theme || "light";
-    color.value = saved.color || "#713BFF";
-    times.checked = saved.times ?? true;
-    notifications.checked = saved.notifications ?? false;
-
-    save.addEventListener("click", () => {
-
-        const settings = {
-            theme: theme.value,
-            color: color.value,
-            times: times.checked,
-            notifications: notifications.checked
-        };
-
-        localStorage.setItem(
-            "churchSettings",
-            JSON.stringify(settings)
+        const trigger = event.target.closest(
+            ".conversation-menu-trigger"
         );
 
-        document.documentElement.style.setProperty(
-            "--primary",
-            settings.color
-        );
+        const menus = document.querySelectorAll(".conversation-menu");
 
-        document.body.classList.toggle(
-            "church-dark-mode",
-            settings.theme === "dark"
-        );
+        // Clic sur les trois points
+        if (trigger) {
+            event.preventDefault();
+            event.stopPropagation();
 
-        message.textContent = "Préférences enregistrées !";
+            const currentMenu = trigger.closest(".conversation-menu");
+            const wasOpen = currentMenu.classList.contains("open");
+
+            // Fermer les autres menus
+            menus.forEach(menu => {
+                menu.classList.remove("open");
+                menu.querySelector(".conversation-menu-trigger")
+                    ?.setAttribute("aria-expanded", "false");
+            });
+
+            // Ouvrir ou fermer le menu sélectionné
+            if (!wasOpen) {
+                currentMenu.classList.add("open");
+                trigger.setAttribute("aria-expanded", "true");
+            }
+
+            return;
+        }
+
+        // Garder le menu ouvert lorsqu'on clique dedans
+        if (event.target.closest(".conversation-menu")) {
+            return;
+        }
+
+        // Fermer lorsqu'on clique à l'extérieur
+        menus.forEach(menu => {
+            menu.classList.remove("open");
+            menu.querySelector(".conversation-menu-trigger")
+                ?.setAttribute("aria-expanded", "false");
+        });
 
     });
 

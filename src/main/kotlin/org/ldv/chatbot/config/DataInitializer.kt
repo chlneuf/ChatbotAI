@@ -94,7 +94,9 @@ class DataInitializer(
         // COMPTE ADMINISTRATEUR
         val adminEmail = "admin@church.local"
 
-        if (utilisateurDAO.findByEmail(adminEmail) == null) {
+        val adminExistant = utilisateurDAO.findByEmail(adminEmail)
+
+        if (adminExistant == null) {
             utilisateurDAO.save(
                 Utilisateur(
                     pseudo = "Administrateur",
@@ -103,9 +105,18 @@ class DataInitializer(
                     role = roleAdmin
                 )
             )
-            println("Compte administrateur créé.")
-        }
 
-        println("Initialisation des fournisseurs, modèles IA, rôles et administrateur terminée.")
+            println("Compte administrateur créé.")
+        } else {
+            adminExistant.motDePasse =
+                passwordEncoder.encode("AdminChurch123!")!!
+
+            adminExistant.role = roleAdmin
+
+            utilisateurDAO.save(adminExistant)
+
+            println("Compte administrateur mis à jour.")
+        }
     }
 }
+

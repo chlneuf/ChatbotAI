@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modifier un modèle IA - Church</title>
+</head>
+<body>
+
+<h1>Modifier un modèle IA</h1>
+
+<p>
+    <a th:href="@{/admin/modeles-ia}">Retour à la liste des modèles</a>
+</p>
+
+<form th:action="@{/admin/modeles-ia/{id}(id=${modeleIA.id})}"
+      method="post">
+
+    <input type="hidden" name="_method" value="PUT">
+
+    <div>
+        <label for="name">Nom du modèle :</label>
+        <input
+                type="text"
+                id="name"
+                name="name"
+                th:value="${modeleIA.name}"
+                required
+        >
+    </div>
+
+    <div>
+        <label for="providerId">Fournisseur IA :</label>
+        <select id="providerId" name="providerId" required>
+            <option
+                    th:each="fournisseur : ${fournisseursIA}"
+                    th:value="${fournisseur.id}"
+                    th:text="${fournisseur.name}"
+                    th:selected="${fournisseur.id == modeleIA.provider.id}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label for="urlApi">URL de l'API :</label>
+        <input
+                type="url"
+                id="urlApi"
+                name="urlApi"
+                th:value="${modeleIA.urlApi}"
+                required
+        >
+    </div>
+
+    <div>
+        <label for="descriptor">Description :</label>
+        <textarea
+                id="descriptor"
+                name="descriptor"
+                rows="4"
+                th:text="${modeleIA.descriptor}">
+        </textarea>
+    </div>
+
+    <button type="submit">Enregistrer les modifications</button>
+
+</form>
+
+</body>
+</html>

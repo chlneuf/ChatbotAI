@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestion des modèles IA - Church</title>
+</head>
+<body>
+
+<h1>Gestion des modèles IA</h1>
+
+<div th:if="${succes}" th:text="${succes}"></div>
+<div th:if="${erreur}" th:text="${erreur}"></div>
+
+<p>
+    <a th:href="@{/admin}">Retour au tableau de bord</a>
+    |
+    <a th:href="@{/admin/modeles-ia/create}">Ajouter un modèle IA</a>
+</p>
+
+<table>
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Fournisseur</th>
+        <th>URL API</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="modele : ${modelesIA}">
+        <td th:text="${modele.name}"></td>
+        <td th:text="${modele.provider.name}"></td>
+        <td th:text="${modele.urlApi}"></td>
+        <td th:text="${modele.descriptor}"></td>
+        <td>
+            <a th:href="@{/admin/modeles-ia/{id}(id=${modele.id})}">
+                Voir
+            </a>
+
+            <a th:href="@{/admin/modeles-ia/{id}/edit(id=${modele.id})}">
+                Modifier
+            </a>
+
+            <form th:action="@{/admin/modeles-ia/{id}(id=${modele.id})}"
+                  method="post"
+                  style="display:inline">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit"
+                        onclick="return confirm('Supprimer ce modèle IA ?')">
+                    Supprimer
+                </button>
+            </form>
+        </td>
+    </tr>
+
+    <tr th:if="${#lists.isEmpty(modelesIA)}">
+        <td colspan="5">Aucun modèle IA enregistré.</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

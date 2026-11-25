@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ajouter un modèle IA - Church</title>
+</head>
+<body>
+
+<h1>Ajouter un modèle IA</h1>
+
+<p>
+    <a th:href="@{/admin/modeles-ia}">Retour à la liste des modèles</a>
+</p>
+
+<form th:action="@{/admin/modeles-ia}" method="post">
+
+    <div>
+        <label for="name">Nom du modèle :</label>
+        <input
+                type="text"
+                id="name"
+                name="name"
+                required
+        >
+    </div>
+
+    <div>
+        <label for="providerId">Fournisseur IA :</label>
+        <select id="providerId" name="providerId" required>
+            <option value="">-- Choisir un fournisseur --</option>
+            <option
+                    th:each="fournisseur : ${fournisseursIA}"
+                    th:value="${fournisseur.id}"
+                    th:text="${fournisseur.name}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label for="urlApi">URL de l'API :</label>
+        <input
+                type="url"
+                id="urlApi"
+                name="urlApi"
+                required
+        >
+    </div>
+
+    <div>
+        <label for="descriptor">Description :</label>
+        <textarea
+                id="descriptor"
+                name="descriptor"
+                rows="4">
+        </textarea>
+    </div>
+
+    <button type="submit">Enregistrer le modèle</button>
+
+</form>
+
+</body>
+</html>

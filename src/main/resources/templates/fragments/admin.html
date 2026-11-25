@@ -4,155 +4,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Church - Administration</title>
-
-    <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/vendor/bootstrap-icons/bootstrap-icons.min.css}">
-
-    <style>
-        body {
-            background: #101027;
-            color: white;
-            font-family: Arial, sans-serif;
-            padding: 40px;
-        }
-
-        .admin-container {
-            max-width: 1100px;
-            margin: auto;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 35px;
-        }
-
-        .admin-header h1 {
-            color: #A78BFA;
-            font-weight: bold;
-        }
-
-        .admin-card {
-            background: #1B1A38;
-            border: 1px solid #37345F;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-
-        .admin-number {
-            font-size: 35px;
-            font-weight: bold;
-            color: #A78BFA;
-        }
-
-        .table {
-            color: white;
-            vertical-align: middle;
-        }
-
-        .table th {
-            color: #A78BFA;
-        }
-
-        .table td, .table th {
-            border-color: #37345F;
-            padding: 15px;
-        }
-
-        .badge-admin {
-            background: #713BFF;
-        }
-
-        .badge-user {
-            background: #45435F;
-        }
-
-        .admin-button {
-            background: #713BFF;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 18px;
-            text-decoration: none;
-        }
-
-        .admin-button:hover {
-            background: #895FFF;
-            color: white;
-        }
-    </style>
+    <title>Administration - Church</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
+<body style="background:#101027; color:white; padding:40px;">
 
-<body>
+<div style="max-width:1100px; margin:auto;">
 
-<div class="admin-container">
+    <h1 style="color:#A78BFA;">
+        <i class="bi bi-shield-lock"></i>
+        Administration Church
+    </h1>
 
-    <div class="admin-header">
-        <div>
-            <h1><i class="bi bi-shield-lock"></i> Church Administration</h1>
-            <p class="text-secondary">Gestion de la plateforme</p>
-        </div>
+    <p style="color:#aaa;">Gestion de la plateforme</p>
 
-        <a th:href="@{/}" class="admin-button">
-            <i class="bi bi-arrow-left"></i>
-            Retour au chatbot
-        </a>
+    <div style="
+        background:#211E42;
+        padding:25px;
+        border-radius:15px;
+        margin:30px 0;
+        max-width:300px;">
+
+        <h3>Utilisateurs inscrits</h3>
+
+        <h1 style="color:#A78BFA;"
+            th:text="${nombreUtilisateurs}">0</h1>
     </div>
 
-    <div class="admin-card">
-        <h5>Nombre d'utilisateurs inscrits</h5>
-        <div class="admin-number" th:text="${nombreUtilisateurs}">0</div>
+    <h2>Liste des utilisateurs</h2>
+
+    <div style="overflow-x:auto;">
+        <table style="
+            width:100%;
+            border-collapse:collapse;
+            background:#211E42;
+            border-radius:12px;">
+
+            <thead>
+            <tr style="color:#A78BFA; text-align:left;">
+                <th style="padding:15px;">ID</th>
+                <th style="padding:15px;">Pseudo</th>
+                <th style="padding:15px;">Email</th>
+                <th style="padding:15px;">Rôle</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="u : ${utilisateurs}"
+                style="border-top:1px solid #39345F;">
+
+                <td style="padding:15px;" th:text="${u.id}"></td>
+                <td style="padding:15px;" th:text="${u.pseudo}"></td>
+                <td style="padding:15px;" th:text="${u.email}"></td>
+
+                <td style="padding:15px;"
+                    th:text="${u.role.nom}"></td>
+            </tr>
+            </tbody>
+
+        </table>
     </div>
 
-    <div class="admin-card">
-
-        <h4 class="mb-4">
-            <i class="bi bi-people"></i>
-            Gestion des utilisateurs
-        </h4>
-
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Pseudo</th>
-                    <th>E-mail</th>
-                    <th>Rôle</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr th:each="u : ${utilisateurs}">
-                    <td th:text="${u.id}">1</td>
-                    <td th:text="${u.pseudo}">Utilisateur</td>
-                    <td th:text="${u.email}">email@example.com</td>
-                    <td>
-                            <span th:if="${u.role.nomLogique == 'ROLE_ADMIN'}"
-                                  class="badge badge-admin">
-                                Administrateur
-                            </span>
-
-                        <span th:unless="${u.role.nomLogique == 'ROLE_ADMIN'}"
-                              class="badge badge-user">
-                                Utilisateur
-                            </span>
-                    </td>
-                </tr>
-
-                <tr th:if="${#lists.isEmpty(utilisateurs)}">
-                    <td colspan="4" class="text-center text-secondary">
-                        Aucun utilisateur enregistré.
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-    </div>
+    <a th:href="@{/}"
+       style="
+       display:inline-block;
+       margin-top:30px;
+       color:#A78BFA;
+       text-decoration:none;">
+        <i class="bi bi-arrow-left"></i>
+        Retour au chatbot
+    </a>
 
 </div>
 

@@ -23,5 +23,12 @@ class Utilisateur(
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "role_id", nullable = false)
-    var role: Role
+    var role: Role,
+
+    @OneToMany(
+        mappedBy = "utilisateur",
+        cascade = [CascadeType.REMOVE],
+        orphanRemoval = true
+    )
+    var conversations: MutableList<Conversation> = mutableListOf()
 )

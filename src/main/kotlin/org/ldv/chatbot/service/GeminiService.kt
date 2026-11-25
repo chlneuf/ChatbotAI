@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Service
 class GeminiService(
@@ -21,11 +24,27 @@ class GeminiService(
 
     override fun envoyerPrompt(prompt: String, modele: AIModel): String {
 
+        val dateActuelle = LocalDate.now(ZoneId.of("Europe/Paris"))
+            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+
+        val promptAvecContexte = """
+            CONTEXTE TEMPOREL IMPORTANT :
+            Nous sommes actuellement le $dateActuelle.
+            Utilise cette date comme référence pour toutes les questions
+            concernant la date actuelle, l'année et les événements récents.
+            Ne prétends pas être à une date antérieure.
+            Si tu ne connais pas une information récente, précise-le
+            au lieu de l'inventer.
+
+            MESSAGE DE L'UTILISATEUR :
+            $prompt
+        """.trimIndent()
+
         val request = GeminiChatRequest(
             contents = listOf(
                 GeminiContent(
                     role = "user",
-                    parts = listOf(GeminiPart(text = prompt))
+                    parts = listOf(GeminiPart(text = promptAvecContexte))
                 )
             )
         )

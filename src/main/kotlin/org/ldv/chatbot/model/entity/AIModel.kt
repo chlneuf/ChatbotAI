@@ -1,6 +1,6 @@
+
 package org.ldv.chatbot.model.entity
 
-import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -11,11 +11,12 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 
 @Entity
-class AIModel (
+class AIModel(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     var id: Long? = null,
+
     var name: String,
     var urlApi: String,
     var descriptor: String,
@@ -24,8 +25,6 @@ class AIModel (
     @JoinColumn(name = "provider_id")
     var provider: AIProvider,
 
-    @OneToMany(mappedBy = "model",cascade = [CascadeType.REMOVE], orphanRemoval = true)
-var conversations: MutableList<Conversation> = mutableListOf()
-    ) {
-
-}
+    @OneToMany(mappedBy = "model")
+    var conversations: MutableList<Conversation> = mutableListOf()
+)

@@ -1,5 +1,6 @@
 
 <div xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
      th:fragment="header"
      class="church-sidebar">
 
@@ -47,8 +48,8 @@
 
           <span class="history-item-title"
                 th:text="${c.title}">
-                        Nouvelle conversation
-                    </span>
+            Nouvelle conversation
+          </span>
         </a>
 
         <!-- MENU TROIS POINTS -->
@@ -73,22 +74,27 @@
                 <i th:class="${c.pinned} ? 'bi bi-pin-fill' : 'bi bi-pin'"></i>
 
                 <span th:text="${c.pinned} ? 'Désépingler' : 'Épingler'">
-                                    Épingler
-                                </span>
+                  Épingler
+                </span>
 
                 <span class="menu-shortcut">P</span>
               </button>
             </form>
+
 
             <!-- RENOMMER -->
             <form th:action="@{/conversations/{id}/rename(id=${c.id})}"
                   method="post"
                   class="rename-conversation-form">
 
+              <label class="rename-conversation-label">
+                Nouveau titre
+              </label>
+
               <input type="text"
                      name="title"
                      class="rename-conversation-input"
-                     placeholder="Nouveau nom"
+                     placeholder="Saisir le nouveau titre..."
                      maxlength="100"
                      required>
 
@@ -96,9 +102,10 @@
                       class="conversation-menu-item">
                 <i class="bi bi-pencil"></i>
                 Renommer
-                <span class="menu-shortcut">R</span>
               </button>
+
             </form>
+
 
             <!-- PARTAGER -->
             <button type="button"
@@ -166,6 +173,15 @@
   <!-- BAS DE LA SIDEBAR -->
   <div class="sidebar-bottom">
 
+    <!-- ADMINISTRATION : ADMIN UNIQUEMENT -->
+    <a sec:authorize="hasRole('ADMIN')"
+       th:href="@{/admin}"
+       class="church-bottom-link">
+      <i class="bi bi-shield-lock"></i>
+      <span>Administration</span>
+    </a>
+
+    <!-- PROFIL -->
     <a th:href="@{/profil}" class="church-bottom-link">
       <i class="bi bi-person-circle"></i>
       <span th:text="${utilisateur != null ? utilisateur.pseudo : 'Mon profil'}">
@@ -173,11 +189,13 @@
       </span>
     </a>
 
+    <!-- PARAMÈTRES -->
     <a th:href="@{/parametres}" class="church-bottom-link">
       <i class="bi bi-gear-fill"></i>
       <span>Paramètres</span>
     </a>
 
+    <!-- DÉCONNEXION -->
     <form th:action="@{/logout}" method="post">
       <button type="submit" class="church-bottom-link logout-button">
         <i class="bi bi-box-arrow-right"></i>

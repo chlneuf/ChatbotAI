@@ -14,11 +14,13 @@ import org.springframework.security.web.SecurityFilterChain
 @Configuration
 class SecurityConfig {
 
+    // Encodage des mots de passe avec BCrypt
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
 
+    // Vérification des identifiants à partir de la base de données
     @Bean
     fun authenticationProvider(
         utilisateurDetailsService: UtilisateurDetailsService,
@@ -29,12 +31,17 @@ class SecurityConfig {
         return provider
     }
 
+    // Configuration générale de la sécurité
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
         authenticationProvider: AuthenticationProvider
     ): SecurityFilterChain {
+
         http
+            .authenticationProvider(authenticationProvider)
+
+            // Gestion des autorisations
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/inscription",
@@ -42,25 +49,36 @@ class SecurityConfig {
                     "/css/**",
                     "/js/**",
                     "/images/**",
-                    "/vendor/**"
+                    "/vendor/**",
+                    "/favicon.ico",
+                    "/error"
                 ).permitAll()
 
-                // Réserver l'administration aux administrateurs
+                // Accès réservé aux administrateurs
                 it.requestMatchers("/admin/**").hasRole("ADMIN")
 
-                // Toutes les autres pages nécessitent une connexion
+                // Toutes les autres pages nécessitent une authentification
                 it.anyRequest().authenticated()
             }
+
+            // Gestion de la connexion
             .formLogin {
                 it.loginPage("/connexion")
                     .loginProcessingUrl("/connexion")
                     .usernameParameter("email")
-                    .defaultSuccessUrl("/", false)
+                    .passwordParameter("password")
+                    .defaultSuccessUrl("/", true)
+                    .failureUrl("/connexion?erreur")
                     .permitAll()
             }
+
+            // Gestion de la déconnexion
             .logout {
                 it.logoutUrl("/logout")
                     .logoutSuccessUrl("/connexion?deconnexion")
+                    .invalidateHttpSession(true)
+                    .clearAuthentication(true)
+                    .deleteCookies("JSESSIONID")
                     .permitAll()
             }
 

@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Détails du modèle IA - Church</title>
+</head>
+<body>
+
+<h1>Détails du modèle IA</h1>
+
+<p>
+    <a th:href="@{/admin/modeles-ia}">Retour à la liste</a>
+</p>
+
+<section>
+    <h2 th:text="${modeleIA.name}">Nom du modèle</h2>
+
+    <p>
+        <strong>Identifiant :</strong>
+        <span th:text="${modeleIA.id}"></span>
+    </p>
+
+    <p>
+        <strong>Fournisseur :</strong>
+        <span th:text="${modeleIA.provider.name}"></span>
+    </p>
+
+    <p>
+        <strong>URL de l'API :</strong>
+        <span th:text="${modeleIA.urlApi}"></span>
+    </p>
+
+    <p>
+        <strong>Description :</strong>
+        <span th:text="${modeleIA.descriptor}"></span>
+    </p>
+</section>
+
+<p>
+    <a th:href="@{/admin/modeles-ia/{id}/edit(id=${modeleIA.id})}">
+        Modifier ce modèle
+    </a>
+</p>
+
+</body>
+</html>

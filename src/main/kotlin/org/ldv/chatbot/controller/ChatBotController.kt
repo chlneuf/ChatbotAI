@@ -268,6 +268,8 @@ class ChatController(
         val conversation = chargerConversation(id, utilisateur.id!!)
 
         conversation.pinned = !conversation.pinned
+        conversation.dateDerniereModification = LocalDateTime.now()
+
         conversationDAO.save(conversation)
 
         return "redirect:/"
@@ -276,6 +278,6 @@ class ChatController(
     // Paramètres
     @GetMapping("/parametres")
     fun afficherParametres(): String {
-        return "fragements/parametres"
+        return "fragments/parametres"
     }
 }
