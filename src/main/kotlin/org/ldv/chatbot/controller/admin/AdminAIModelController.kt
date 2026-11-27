@@ -21,26 +21,23 @@ class AdminAIModelController(
     private val conversationDAO: ConversationDAO
 ) {
 
-    // Liste des modèles
     @GetMapping
     fun index(model: Model): String {
         model.addAttribute("modelesIA", aiModelDAO.findAll())
         return "admin/modeleIA/index"
     }
 
-    // Formulaire de création
     @GetMapping("/create")
     fun create(model: Model): String {
         model.addAttribute("fournisseursIA", aiProviderDAO.findAll())
         return "admin/modeleIA/create"
     }
 
-    // Enregistrement d'un modèle
     @PostMapping
     fun store(
         @RequestParam name: String,
         @RequestParam urlApi: String,
-        @RequestParam descriptor: String,
+        @RequestParam(defaultValue = "") descriptor: String,
         @RequestParam providerId: Long,
         redirectAttributes: RedirectAttributes
     ): String {
@@ -60,14 +57,14 @@ class AdminAIModelController(
                 )
             }
 
-        val modele = AIModel(
-            name = name.trim(),
-            urlApi = urlApi.trim(),
-            descriptor = descriptor.trim(),
-            provider = provider
+        aiModelDAO.save(
+            AIModel(
+                name = name.trim(),
+                urlApi = urlApi.trim(),
+                descriptor = descriptor.trim(),
+                provider = provider
+            )
         )
-
-        aiModelDAO.save(modele)
 
         redirectAttributes.addFlashAttribute(
             "succes",
@@ -77,39 +74,16 @@ class AdminAIModelController(
         return "redirect:/admin/modeles-ia"
     }
 
-    // Détails d'un modèle
     @GetMapping("/{id}")
-    fun show(
-        @PathVariable id: Long,
-        model: Model
-    ): String {
-
-        val modele = aiModelDAO.findById(id)
-            .orElseThrow {
-                ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Modèle IA introuvable"
-                )
-            }
-
+    fun show(@PathVariable id: Long, model: Model): String {
+        val modele = trouverModele(id)
         model.addAttribute("modeleIA", modele)
         return "admin/modeleIA/show"
     }
 
-    // Formulaire de modification
     @GetMapping("/{id}/edit")
-    fun edit(
-        @PathVariable id: Long,
-        model: Model
-    ): String {
-
-        val modele = aiModelDAO.findById(id)
-            .orElseThrow {
-                ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Modèle IA introuvable"
-                )
-            }
+    fun edit(@PathVariable id: Long, model: Model): String {
+        val modele = trouverModele(id)
 
         model.addAttribute("modeleIA", modele)
         model.addAttribute("fournisseursIA", aiProviderDAO.findAll())
@@ -117,13 +91,12 @@ class AdminAIModelController(
         return "admin/modeleIA/edit"
     }
 
-    // Enregistrement des modifications
     @PutMapping("/{id}")
     fun update(
         @PathVariable id: Long,
         @RequestParam name: String,
         @RequestParam urlApi: String,
-        @RequestParam descriptor: String,
+        @RequestParam(defaultValue = "") descriptor: String,
         @RequestParam providerId: Long,
         redirectAttributes: RedirectAttributes
     ): String {
@@ -135,13 +108,7 @@ class AdminAIModelController(
             )
         }
 
-        val modele = aiModelDAO.findById(id)
-            .orElseThrow {
-                ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Modèle IA introuvable"
-                )
-            }
+        val modele = trouverModele(id)
 
         val provider = aiProviderDAO.findById(providerId)
             .orElseThrow {
@@ -151,9 +118,10 @@ class AdminAIModelController(
                 )
             }
 
-        // Ne pas modifier un modèle utilisé par des conversations
-        if (conversationDAO.existsByModel(modele) &&
-            (modele.provider.id != provider.id || modele.urlApi != urlApi.trim())
+        if (
+            conversationDAO.existsByModel(modele) &&
+            (modele.provider.id != provider.id ||
+                    modele.urlApi != urlApi.trim())
         ) {
             throw ResponseStatusException(
                 HttpStatus.CONFLICT,
@@ -176,42 +144,52 @@ class AdminAIModelController(
         return "redirect:/admin/modeles-ia"
     }
 
-    // Suppression d'un modèle
     @DeleteMapping("/{id}")
     fun destroy(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes
     ): String {
 
-        val modele = aiModelDAO.findById(id)
+        println(">>> SUPPRESSION DEMANDEE POUR LE MODELE ID : $id")
+
+        val modele = trouverModele(id)
+
+        if (conversationDAO.existsByModel(modele)) {
+            redirectAttributes.addFlashAttribute(
+                "erreur",
+                "Ce modèle IA est utilisé dans une conversation et ne peut pas être supprimé."
+            )
+            return "redirect:/admin/modeles-ia"
+        }
+
+        return try {
+            aiModelDAO.delete(modele)
+            aiModelDAO.flush()
+
+            redirectAttributes.addFlashAttribute(
+                "succes",
+                "Le modèle IA a été supprimé avec succès."
+            )
+
+            "redirect:/admin/modeles-ia"
+
+        } catch (exception: DataIntegrityViolationException) {
+            redirectAttributes.addFlashAttribute(
+                "erreur",
+                "Impossible de supprimer ce modèle IA : il est encore utilisé."
+            )
+
+            "redirect:/admin/modeles-ia"
+        }
+    }
+
+    private fun trouverModele(id: Long): AIModel {
+        return aiModelDAO.findById(id)
             .orElseThrow {
                 ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Modèle IA introuvable"
                 )
             }
-
-        if (conversationDAO.existsByModel(modele)) {
-            redirectAttributes.addFlashAttribute(
-                "erreur",
-                "Ce modèle IA est utilisé dans une conversation."
-            )
-        } else {
-            try {
-                aiModelDAO.delete(modele)
-
-                redirectAttributes.addFlashAttribute(
-                    "succes",
-                    "Le modèle IA a été supprimé avec succès."
-                )
-            } catch (exception: DataIntegrityViolationException) {
-                redirectAttributes.addFlashAttribute(
-                    "erreur",
-                    "Ce modèle IA ne peut pas être supprimé."
-                )
-            }
-        }
-
-        return "redirect:/admin/modeles-ia"
     }
 }

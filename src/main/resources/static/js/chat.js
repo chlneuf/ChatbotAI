@@ -1,7 +1,48 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Agrandissement automatique du champ de saisie
+    // ==========================================
+    // THÈME CLAIR / SOMBRE
+    // ==========================================
+
+    const themeToggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    function appliquerTheme(theme) {
+        html.setAttribute("data-theme", theme);
+        localStorage.setItem("churchTheme", theme);
+
+        if (themeToggle) {
+            const estSombre = theme === "dark";
+
+            themeToggle.innerHTML = estSombre
+                ? '<i class="bi bi-sun-fill" aria-hidden="true"></i><span>Mode clair</span>'
+                : '<i class="bi bi-moon-stars-fill" aria-hidden="true"></i><span>Mode sombre</span>';
+
+            themeToggle.setAttribute(
+                "aria-label",
+                estSombre ? "Activer le thème clair" : "Activer le thème sombre"
+            );
+
+            themeToggle.setAttribute("aria-pressed", String(estSombre));
+        }
+    }
+
+    const themeEnregistre = localStorage.getItem("churchTheme");
+    appliquerTheme(themeEnregistre === "dark" ? "dark" : "light");
+
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
+            const themeActuel = html.getAttribute("data-theme");
+            appliquerTheme(themeActuel === "dark" ? "light" : "dark");
+        });
+    }
+
+
+    // ==========================================
+    // CHAMP DE SAISIE DU CHAT
+    // ==========================================
+
     document.querySelectorAll(".chat-textarea").forEach(textarea => {
 
         const ajusterHauteur = () => {
@@ -11,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         textarea.addEventListener("input", ajusterHauteur);
 
-        // Entrée pour envoyer, Maj + Entrée pour revenir à la ligne
         textarea.addEventListener("keydown", event => {
             if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -23,10 +63,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+
     });
 
-    // Indicateur de chargement lors de l'envoi
+
+    // ==========================================
+    // INDICATEUR DE CHARGEMENT
+    // ==========================================
+
     document.querySelectorAll(".chat-form").forEach(form => {
+
         form.addEventListener("submit", () => {
 
             const textarea = form.querySelector(".chat-textarea");
@@ -45,17 +91,23 @@ document.addEventListener("DOMContentLoaded", () => {
             if (loading) {
                 loading.hidden = false;
             }
+
         });
+
     });
 
-    // Copier une réponse de l'assistant
+
+    // ==========================================
+    // COPIER UNE RÉPONSE
+    // ==========================================
+
     document.querySelectorAll(".copy-message-button").forEach(button => {
 
         button.addEventListener("click", async () => {
 
             const message = button
                 .closest(".message-bubble")
-                .querySelector(".message-content");
+                ?.querySelector(".message-content");
 
             if (!message) return;
 
@@ -74,91 +126,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Impossible de copier le message :", error);
                 button.textContent = "Copie impossible";
             }
+
         });
 
     });
 
-});
 
-document.addEventListener("DOMContentLoaded", () => {
+    // ==========================================
+    // MENUS DES CONVERSATIONS
+    // ==========================================
 
-    const menus = document.querySelectorAll(".conversation-menu");
-
-    menus.forEach(menu => {
-        const trigger = menu.querySelector(".conversation-menu-trigger");
-
-        trigger.addEventListener("click", event => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            menus.forEach(otherMenu => {
-                if (otherMenu !== menu) {
-                    otherMenu.classList.remove("open");
-                    otherMenu.querySelector(".conversation-menu-trigger")
-                        .setAttribute("aria-expanded", "false");
-                }
-            });
-
-            menu.classList.toggle("open");
-
-            trigger.setAttribute(
-                "aria-expanded",
-                menu.classList.contains("open") ? "true" : "false"
-            );
-        });
-    });
-
-    document.addEventListener("click", () => {
-        menus.forEach(menu => {
-            menu.classList.remove("open");
-            menu.querySelector(".conversation-menu-trigger")
-                .setAttribute("aria-expanded", "false");
-        });
-    });
-
-});
-
-// Partager une conversation
-document.querySelectorAll(".share-conversation-button").forEach(button => {
-
-    button.addEventListener("click", async () => {
-
-        const relativeUrl = button.dataset.url;
-        const shareUrl = new URL(relativeUrl, window.location.origin).href;
-
-        try {
-            await navigator.clipboard.writeText(shareUrl);
-
-            const originalContent = button.innerHTML;
-
-            button.innerHTML = '<i class="bi bi-check2"></i> Lien copié !';
-
-            setTimeout(() => {
-                button.innerHTML = originalContent;
-            }, 2000);
-
-        } catch (error) {
-            console.error("Erreur de partage :", error);
-            window.prompt("Copie ce lien :", shareUrl);
-        }
-    });
-
-});
-// Paramètres Church
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    // Gestion des menus des conversations
     document.addEventListener("click", event => {
+
+        const menus = document.querySelectorAll(".conversation-menu");
 
         const trigger = event.target.closest(
             ".conversation-menu-trigger"
         );
 
-        const menus = document.querySelectorAll(".conversation-menu");
-
-        // Clic sur les trois points
         if (trigger) {
             event.preventDefault();
             event.stopPropagation();
@@ -166,14 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const currentMenu = trigger.closest(".conversation-menu");
             const wasOpen = currentMenu.classList.contains("open");
 
-            // Fermer les autres menus
             menus.forEach(menu => {
                 menu.classList.remove("open");
                 menu.querySelector(".conversation-menu-trigger")
                     ?.setAttribute("aria-expanded", "false");
             });
 
-            // Ouvrir ou fermer le menu sélectionné
             if (!wasOpen) {
                 currentMenu.classList.add("open");
                 trigger.setAttribute("aria-expanded", "true");
@@ -182,16 +165,53 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Garder le menu ouvert lorsqu'on clique dedans
         if (event.target.closest(".conversation-menu")) {
             return;
         }
 
-        // Fermer lorsqu'on clique à l'extérieur
         menus.forEach(menu => {
             menu.classList.remove("open");
             menu.querySelector(".conversation-menu-trigger")
                 ?.setAttribute("aria-expanded", "false");
+        });
+
+    });
+
+
+    // ==========================================
+    // PARTAGER UNE CONVERSATION
+    // ==========================================
+
+    document.querySelectorAll(".share-conversation-button").forEach(button => {
+
+        button.addEventListener("click", async () => {
+
+            const relativeUrl = button.dataset.url;
+
+            if (!relativeUrl) return;
+
+            const shareUrl = new URL(
+                relativeUrl,
+                window.location.origin
+            ).href;
+
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+
+                const originalContent = button.innerHTML;
+
+                button.innerHTML =
+                    '<i class="bi bi-check2"></i> Lien copié !';
+
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                }, 2000);
+
+            } catch (error) {
+                console.error("Erreur de partage :", error);
+                window.prompt("Copie ce lien :", shareUrl);
+            }
+
         });
 
     });

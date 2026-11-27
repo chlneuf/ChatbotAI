@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import java.time.LocalDateTime
 
 @Controller
@@ -77,7 +78,8 @@ class ChatController(
     fun creerConversation(
         @RequestParam prompt: String,
         @RequestParam idModele: Long,
-        authentication: Authentication
+        authentication: Authentication,
+        redirectAttributes: RedirectAttributes
     ): String {
 
         val utilisateur = utilisateurConnecte(authentication)
@@ -116,6 +118,8 @@ class ChatController(
 
         messageDAO.save(messageUtilisateur)
 
+        var lectureAuto = false
+
         try {
             val iaService = iaServiceFactory.getService(modele)
             val reponse = iaService.envoyerPrompt(promptNettoye, modele)
@@ -129,12 +133,18 @@ class ChatController(
 
             messageDAO.save(messageAssistant)
 
+            lectureAuto = true
+
         } catch (e: Exception) {
             println("Erreur lors de l'appel au modèle ${modele.name} : ${e.message}")
         }
 
         conversationEnregistree.dateDerniereModification = LocalDateTime.now()
         conversationDAO.save(conversationEnregistree)
+
+        if (lectureAuto) {
+            redirectAttributes.addFlashAttribute("lectureAuto", true)
+        }
 
         return "redirect:/conversations/${conversationEnregistree.id}"
     }
@@ -167,7 +177,8 @@ class ChatController(
     fun envoyerMessage(
         @PathVariable id: Long,
         @RequestParam prompt: String,
-        authentication: Authentication
+        authentication: Authentication,
+        redirectAttributes: RedirectAttributes
     ): String {
 
         val utilisateur = utilisateurConnecte(authentication)
@@ -190,6 +201,8 @@ class ChatController(
 
         messageDAO.save(messageUtilisateur)
 
+        var lectureAuto = false
+
         try {
             val modele = conversation.model
             val iaService = iaServiceFactory.getService(modele)
@@ -204,12 +217,18 @@ class ChatController(
 
             messageDAO.save(messageAssistant)
 
+            lectureAuto = true
+
         } catch (e: Exception) {
             println("Erreur lors de l'appel à ${conversation.model.name} : ${e.message}")
         }
 
         conversation.dateDerniereModification = LocalDateTime.now()
         conversationDAO.save(conversation)
+
+        if (lectureAuto) {
+            redirectAttributes.addFlashAttribute("lectureAuto", true)
+        }
 
         return "redirect:/conversations/$id"
     }

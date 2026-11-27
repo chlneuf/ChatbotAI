@@ -4,80 +4,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Administration - Church</title>
+
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="icon" type="image/x-icon" th:href="@{/images/Icone.png}">
 </head>
-<body style="background:#101027; color:white; padding:40px;">
 
-<div style="max-width:1100px; margin:auto;">
+<body class="admin-models-body">
 
-    <h1 style="color:#A78BFA;">
-        <i class="bi bi-shield-lock"></i>
-        Administration Church
-    </h1>
+<main class="admin-models-container">
 
-    <p style="color:#aaa;">Gestion de la plateforme</p>
+    <header class="admin-models-header">
+        <div>
+            <h1>
+                <i class="bi bi-shield-lock"></i>
+                Administration Church
+            </h1>
+            <p>Bienvenue dans l'espace de gestion de la plateforme.</p>
+        </div>
 
-    <div style="
-        background:#211E42;
-        padding:25px;
-        border-radius:15px;
-        margin:30px 0;
-        max-width:300px;">
+        <a th:href="@{/}"
+           class="admin-models-button admin-button-secondary">
+            <i class="bi bi-house"></i>
+            Retour au chatbot
+        </a>
+    </header>
 
-        <h3>Utilisateurs inscrits</h3>
+    <section class="admin-dashboard-stats">
 
-        <h1 style="color:#A78BFA;"
-            th:text="${nombreUtilisateurs}">0</h1>
-    </div>
+        <article class="admin-stat-card">
+            <div class="admin-stat-icon">
+                <i class="bi bi-people"></i>
+            </div>
 
-    <h2>Liste des utilisateurs</h2>
+            <div>
+                <p>Utilisateurs inscrits</p>
+                <h2 th:text="${nombreUtilisateurs}">0</h2>
+            </div>
+        </article>
 
-    <div style="overflow-x:auto;">
-        <table style="
-            width:100%;
-            border-collapse:collapse;
-            background:#211E42;
-            border-radius:12px;">
+        <a th:href="@{/admin/modeles-ia}"
+           class="admin-stat-card admin-stat-link">
+            <div class="admin-stat-icon">
+                <i class="bi bi-robot"></i>
+            </div>
 
-            <thead>
-            <tr style="color:#A78BFA; text-align:left;">
-                <th style="padding:15px;">ID</th>
-                <th style="padding:15px;">Pseudo</th>
-                <th style="padding:15px;">Email</th>
-                <th style="padding:15px;">Rôle</th>
-            </tr>
-            </thead>
+            <div>
+                <p>Gestion des modèles IA</p>
+                <h2>Accéder</h2>
+            </div>
 
-            <tbody>
-            <tr th:each="u : ${utilisateurs}"
-                style="border-top:1px solid #39345F;">
+            <i class="bi bi-arrow-right admin-stat-arrow"></i>
+        </a>
 
-                <td style="padding:15px;" th:text="${u.id}"></td>
-                <td style="padding:15px;" th:text="${u.pseudo}"></td>
-                <td style="padding:15px;" th:text="${u.email}"></td>
+    </section>
 
-                <td style="padding:15px;"
-                    th:text="${u.role.nom}"></td>
-            </tr>
-            </tbody>
+    <section class="admin-models-card admin-users-card">
 
-        </table>
-    </div>
+        <div class="admin-models-card-header">
+            <div>
+                <h2>
+                    <i class="bi bi-people"></i>
+                    Liste des utilisateurs
+                </h2>
+                <p>Consulte les comptes inscrits sur Church.</p>
+            </div>
+        </div>
 
-    <a th:href="@{/}"
-       style="
-       display:inline-block;
-       margin-top:30px;
-       color:#A78BFA;
-       text-decoration:none;">
-        <i class="bi bi-arrow-left"></i>
-        Retour au chatbot
-    </a>
+        <div class="admin-models-table-wrapper">
 
-</div>
+            <table class="admin-models-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Pseudo</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="u : ${utilisateurs}">
+                    <td th:text="${u.id}"></td>
+                    <td class="admin-user-name"
+                        th:text="${u.pseudo}"></td>
+                    <td th:text="${u.email}"></td>
+                    <td>
+                        <span class="admin-role-badge"
+                              th:text="${u.role.nom}">
+                        </span>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(utilisateurs)}">
+                    <td colspan="4" class="admin-models-empty">
+                        <i class="bi bi-person-x"></i>
+                        <p>Aucun utilisateur inscrit.</p>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+    </section>
+
+    <footer class="admin-models-footer">
+
+    </footer>
+
+</main>
 
 </body>
 </html>
